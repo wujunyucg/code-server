@@ -1,0 +1,54 @@
+version: 2.1
+orbs:
+  node: circleci/node@1.1.6
+jobs:
+  build1:
+    executor:
+      name: node/default
+    steps:
+      - run: echo 'build1'
+  hold:
+    executor:
+      name: node/default
+    steps:
+      - run: echo 'hold'
+  test1:
+    executor:
+      name: node/default
+    steps:
+      - run: echo 'test1'
+  test2:
+    executor:
+      name: node/default
+    steps:
+      - run: echo 'test2'
+  test3:
+    executor:
+      name: node/default
+    steps:
+      - run: echo 'test3'
+  test4:
+    executor:
+      name: node/default
+    steps:
+      - run: echo 'test4'
+  
+
+workflows:
+  version: 2
+  build-test-and-approval-deploy:
+    jobs:
+      - build1  # your custom job from your config, that builds your code
+      - test1: # your custom job; runs test suite 1
+      - test2: # another custom job; runs test suite 2,
+      - test3: # <<< A job that will require manual approval in the CircleCI web application.
+          requires: # We only run the "hold" job when test2 has succeeded
+           - build1
+      - test4: # <<< A job that will require manual approval in the CircleCI web application.
+          requires: # We only run the "hold" job when test2 has succeeded
+           - test1
+      # On approval of the `hold` job, any successive job that requires the `hold` job will run. 
+      # In this case, a user is manually triggering the deploy job.
+      - hold:
+          requires:
+            - test2
